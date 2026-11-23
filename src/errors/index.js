@@ -2,7 +2,7 @@
 
 /** A refusal the app gives. Services throw these; the error middleware turns them into problem+json.,*/
 class DomainError extends Error {
-  constructor(status,type,title,detail){
+  constructor(status, type, title, detail){
     super(detail);
     this.status = status;
     this.type = type;
@@ -13,14 +13,14 @@ class DomainError extends Error {
   extras() {
     return {};
   }
-  }
+}
 
-  class ValidationError extends DomainError {
-    /** @param errors [{ field, message }] */
-    constructor(errors) {
-      super(400,'/errors/validation','Invalid request','The request is not valid');
-      this.errors = errors;
-    }
+class ValidationError extends DomainError {
+  /** @param errors [{ field, message }] */
+  constructor(errors) {
+    super(400, '/errors/validation', 'Invalid request', 'The request is not valid');
+    this.errors = errors;
+  }
 
   extras() {
     return { errors: this.errors };
@@ -39,4 +39,10 @@ class NoSuchRoom extends DomainError {
   }
 }
 
-module.exports = { DomainError, ValidationError, NoSuchProperty, NoSuchRoom };
+class RoomNotOccupied extends DomainError {
+  constructor(no) {
+    super(400, '/errors/room-not-occupied', 'Room not occupied', `Room ${no} has no guest to check out`);
+  }
+}
+
+module.exports = { DomainError, ValidationError, NoSuchProperty, NoSuchRoom, RoomNotOccupied };
