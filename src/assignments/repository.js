@@ -33,13 +33,10 @@ async function openForStays(propertyId, stayIds) {
   const open = await Assignment.find({ propertyId, stayId: { $in: stayIds }, closedAt: null }).lean();
   return new Map(open.map((a) => [a.stayId, a]));
 }
-/** Every assignment of these stays, open or closed. */
-function ofStays(propertyId, stayIds) {
-  return Assignment.find({ propertyId, stayId: { $in: stayIds } }).lean();
+
+/** Stamps the assignment; inside a transaction when given its session. */
+async function stamp(assignmentId, fields, session) {
+  await Assignment.updateOne({ assignmentId }, { $set: fields }, { session });
 }
 
-async function stamp(assignmentId, fields) {
-  await Assignment.updateOne({ assignmentId }, { $set: fields });
-}
-
-module.exports = { nextId, insert, byId, openForStays, ofStays, stamp };
+module.exports = { nextId, insert, byId, openForStays, stamp };
